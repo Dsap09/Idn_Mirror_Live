@@ -13,9 +13,6 @@
   
   <!-- Custom Styles -->
   <link rel="stylesheet" href="css/style.css">
-  
-  <!-- HLS.js for HLS video streaming -->
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
 
@@ -63,13 +60,11 @@
 
       <!-- Live Members Grid -->
       <div id="liveGrid" class="live-grid">
-        <!-- Skeleton Loading State -->
         <div class="grid-loading">Memeriksa siaran live member JKT48...</div>
       </div>
 
     </div>
   </section>
-
 
   <!-- VIEW 2: WATCH ROOM VIEW -->
   <section id="watchView" class="view-section hidden">
@@ -87,20 +82,27 @@
 
       <!-- Main 2-Column Grid (Desktop) -->
       <div class="main-layout">
-        <!-- Left Column: Video Player & Info -->
+        <!-- Left Column: Embedded Video Player & Info -->
         <section class="player-column">
           <div class="video-container" id="videoContainer">
             <div class="player-live-badge">
-              <span class="live-pulse"></span> LIVE
+              <span class="live-pulse"></span> LIVE STREAM
             </div>
 
-            <!-- Buffer Spinner -->
+            <!-- Buffer / Loading Spinner -->
             <div class="player-spinner hidden" id="playerSpinner">
               <div class="spinner-ring"></div>
             </div>
 
-            <!-- Video Player Element -->
-            <video id="videoPlayer" playsinline controls></video>
+            <!-- Clean IDN Live Embed Player Iframe -->
+            <iframe 
+              id="idnEmbedPlayer" 
+              class="idn-embed-iframe"
+              src="about:blank"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowfullscreen 
+              frameborder="0">
+            </iframe>
           </div>
 
           <!-- Member Info Card -->
@@ -118,9 +120,9 @@
             </div>
             
             <div class="player-controls-extra">
-              <select id="qualitySelect" class="quality-select" aria-label="Kualitas Video">
-                <option value="auto">Auto Quality</option>
-              </select>
+              <a id="openIdnDirectLink" href="#" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">
+                <span>🔗 Buka di IDN App</span>
+              </a>
             </div>
           </div>
         </section>

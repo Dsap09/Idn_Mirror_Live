@@ -36,50 +36,33 @@ CACHE_TTL_CHAT = 5   # seconds
 MOCK_LIVE_STREAMS = [
     {
         "name": "Freya Jayawardana",
+        "username": "jkt48_freya",
         "img": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
         "room_id": "freya-jkt48",
-        "streaming_url_list": [
-            {
-                "label": "1080p (Original)",
-                "quality": 1,
-                "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-            },
-            {
-                "label": "720p",
-                "quality": 2,
-                "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-            }
-        ],
+        "embed_url": "https://www.idn.app/embed/jkt48_freya",
+        "url": "https://www.idn.app/jkt48_freya/live",
         "type": "idn",
         "viewers": 3420,
         "started_at": "2026-08-02T20:30:00Z"
     },
     {
         "name": "Angelina Christy",
+        "username": "jkt48_christy",
         "img": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80",
         "room_id": "christy-jkt48",
-        "streaming_url_list": [
-            {
-                "label": "1080p (Original)",
-                "quality": 1,
-                "url": "https://playertest.longtailvideo.com/adaptive/bipbop/gear4/prog_index.m3u8"
-            }
-        ],
+        "embed_url": "https://www.idn.app/embed/jkt48_christy",
+        "url": "https://www.idn.app/jkt48_christy/live",
         "type": "idn",
         "viewers": 2890,
         "started_at": "2026-08-02T21:00:00Z"
     },
     {
         "name": "Fiony Alveria",
+        "username": "jkt48_fiony",
         "img": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80",
         "room_id": "fiony-jkt48",
-        "streaming_url_list": [
-            {
-                "label": "1080p (Original)",
-                "quality": 1,
-                "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-            }
-        ],
+        "embed_url": "https://www.idn.app/embed/jkt48_fiony",
+        "url": "https://www.idn.app/jkt48_fiony/live",
         "type": "idn",
         "viewers": 1750,
         "started_at": "2026-08-02T21:15:00Z"

@@ -128,32 +128,52 @@
     viewerCount.textContent = (stream.viewers || 1200).toLocaleString('id-ID');
     streamTime.textContent = stream.started_at ? `Live sejak ${formatTime(stream.started_at)}` : 'Sedang Live';
 
+    const directUrl = stream.url || `https://www.idn.app/${stream.username || stream.room_id}/live`;
+    const openIdnDirectLink = document.getElementById('openIdnDirectLink');
+    if (openIdnDirectLink) openIdnDirectLink.href = directUrl;
+
     // Highlight active card in quick bar
     renderLiveMembersBar(allStreams);
 
-    // Play Stream URL
-    const streamUrls = stream.streaming_url_list || [];
-    const mainUrl = streamUrls.length > 0 ? streamUrls[0].url : '';
-    if (mainUrl) {
-      loadHlsStream(mainUrl);
-    } else {
-      showSpinner(false);
-    }
+    // Load IDN Live Embed Player
+    loadIdnEmbedStream(stream);
 
     // Poll live comments
     startChatPolling(stream.room_id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function checkUrlHashStream() {
-    const hash = window.location.hash;
-    if (hash.startsWith('#room=')) {
-      const roomId = hash.replace('#room=', '');
-      const target = allStreams.find(s => String(s.room_id) === String(roomId));
-      if (target) {
-        showWatchView(target);
-      }
+  function loadIdnEmbedStream(stream) {
+    showSpinner(true);
+    const idnEmbedPlayer = document.getElementById('idnEmbedPlayer');
+    if (!idnEmbedPlayer) return;
+
+    // Formulate clean IDN Live embed URL
+    const username = stream.username || stream.room_id || 'jkt48';
+    const embedUrl = stream.embed_url || `https://www.idn.app/embed/${username}`;
+    
+    idnEmbedPlayer.src = embedUrl;
+    
+    idnEmbedPlayer.onload = () => {
+      showSpinner(false);
+    };
+
+    // Safety timeout for spinner
+    setTimeout(() => {
+      showSpinner(false);
+    }, 2000);
+  }
+
+  function showHomeView() {
+    homeView.classList.remove('hidden');
+    watchView.classList.add('hidden');
+    window.location.hash = '';
+
+    const idnEmbedPlayer = document.getElementById('idnEmbedPlayer');
+    if (idnEmbedPlayer) {
+      idnEmbedPlayer.src = 'about:blank';
     }
+    if (chatPollInterval) clearInterval(chatPollInterval);
   }
 
   // =========================================================================
