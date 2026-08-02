@@ -1,0 +1,14 @@
+{
+  "name": "idn-live-mirror-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Clean live streaming platform mirror for IDN Live JKT48 streams",
+  "scripts": {
+    "dev:backend": "python -m uvicorn apps.backend.api.index:app --reload --port 8000",
+    "dev:frontend": "python -m http.server 3000 --directory apps/frontend",
+    "dev": "pnpm run dev:backend"
+  },
+  "keywords": ["jkt48", "idn-live", "streaming", "fastapi", "hls"],
+  "author": "",
+  "license": "MIT"
+}

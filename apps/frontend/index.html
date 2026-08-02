@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDN Live Mirror – Clean JKT48 Streaming</title>
+  <meta name="description" content="Nonton siaran langsung IDN Live JKT48 dengan tampilan bersih, minimalis, dan tanpa gangguan overlay.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- HLS.js for HLS streaming -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="header-brand">
+        <span class="brand-icon">🎥</span>
+        <h1 class="brand-title">IDN Live Mirror</h1>
+      </div>
+      
+      <div class="header-actions">
+        <div class="live-counter-badge" id="liveCounterBadge">
+          <span class="pulse-dot"></span>
+          <span id="liveCountText">Live: 0</span>
+        </div>
+        
+        <button id="themeToggleBtn" class="icon-btn" aria-label="Ganti Tema (Dark/Light)" title="Ganti Tema">
+          <span id="themeIcon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container: 2 Columns on Desktop -->
+  <main class="main-layout">
+    <!-- Left Column: Video & Member Details (70% Desktop) -->
+    <section class="player-column">
+      <div class="video-container" id="videoContainer">
+        <!-- Live Status Pulse Badge inside player -->
+        <div class="player-live-badge">
+          <span class="live-pulse"></span> LIVE
+        </div>
+
+        <!-- Buffer Spinner -->
+        <div class="player-spinner hidden" id="playerSpinner">
+          <div class="spinner-ring"></div>
+        </div>
+
+        <!-- Video Element -->
+        <video id="videoPlayer" playsinline controls></video>
+      </div>
+
+      <!-- Member Info Bar below Video -->
+      <div class="member-info-card">
+        <div class="member-meta">
+          <img id="memberAvatar" class="member-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Member Avatar">
+          <div class="member-text">
+            <h2 id="memberName" class="member-name">Memuat siaran...</h2>
+            <div class="member-stats">
+              <span class="stat-item"><span class="stat-icon">👁️</span> <span id="viewerCount">0</span> penonton</span>
+              <span class="stat-divider">•</span>
+              <span class="stat-item" id="streamTime">--:--</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="player-controls-extra">
+          <select id="qualitySelect" class="quality-select" aria-label="Pilih Kualitas Video">
+            <option value="auto">Auto Quality</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Comments Panel (30% Desktop) -->
+    <aside class="chat-column">
+      <div class="chat-panel">
+        <div class="chat-header">
+          <h3>💬 Komentar</h3>
+          <span class="chat-status-indicator" id="chatStatus">Real-time</span>
+        </div>
+        
+        <!-- Comments List -->
+        <div class="chat-feed" id="chatFeed">
+          <div class="chat-loading">Memuat komentar...</div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Bottom Bar: Live Members Selector -->
+  <footer class="live-bar-footer">
+    <div class="live-bar-container">
+      <div class="live-bar-title">
+        <span class="live-icon">🔴</span> Live Now
+      </div>
+      <div class="live-members-scroll" id="liveMembersList">
+        <!-- Live Member Cards populated dynamically -->
+        <div class="member-card-skeleton">Memuat daftar member...</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript App -->
+  <script src="js/app.js"></script>
+</body>
+</html>
