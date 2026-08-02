@@ -148,20 +148,21 @@
     const idnEmbedPlayer = document.getElementById('idnEmbedPlayer');
     if (!idnEmbedPlayer) return;
 
-    // Formulate clean IDN Live embed URL
-    const username = stream.username || stream.room_id || 'jkt48';
-    const embedUrl = stream.embed_url || `https://www.idn.app/embed/${username}`;
-    
-    idnEmbedPlayer.src = embedUrl;
+    let targetUrl = stream.embed_url || stream.url || '';
+    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+      targetUrl = `https://www.idn.app/${stream.username || stream.room_id}`;
+    }
+
+    idnEmbedPlayer.src = targetUrl;
     
     idnEmbedPlayer.onload = () => {
       showSpinner(false);
     };
 
-    // Safety timeout for spinner
+    // Safety fallback timeout to hide spinner
     setTimeout(() => {
       showSpinner(false);
-    }, 2000);
+    }, 2500);
   }
 
   function showHomeView() {
@@ -412,43 +413,67 @@
   }
 
   // =========================================================================
-  // Link Input Form Handlers
+  // Robust IDN Live Link & Username Parser
   // =========================================================================
-  function parseIdnUsername(inputStr) {
-    if (!inputStr) return '';
-    let cleaned = inputStr.trim();
+  function parseStreamLink(rawInput) {
+    if (!rawInput) return null;
+    let str = rawInput.trim();
     
-    // Check if input is a URL e.g. https://www.idn.app/jkt48_freya/live or https://www.idn.app/embed/jkt48_freya
-    if (cleaned.includes('idn.app/')) {
-      const parts = cleaned.split('idn.app/')[1].split('/ filter');
-      const segment = parts[0].replace('embed/', '').replace('/live', '').split('?')[0];
-      cleaned = segment;
+    let embedUrl = '';
+    let directUrl = '';
+    let displayName = '';
+    let roomId = '';
+
+    if (str.startsWith('http://') || str.startsWith('https://')) {
+      directUrl = str;
+      try {
+        const urlObj = new URL(str);
+        // Clean path e.g. "idnlinks/live-room-175ikv"
+        const path = urlObj.pathname.replace(/^\/+/, '');
+        roomId = path;
+        
+        if (path.startsWith('embed/')) {
+          embedUrl = `https://${urlObj.host}/${path}`;
+        } else {
+          embedUrl = `https://${urlObj.host}/embed/${path}`;
+        }
+        
+        const pathParts = path.split('/').filter(Boolean);
+        const lastPart = pathParts[pathParts.length - 1] || 'IDN Live Stream';
+        displayName = lastPart.replace(/[-_]/g, ' ').toUpperCase();
+      } catch (e) {
+        embedUrl = str;
+        directUrl = str;
+        displayName = 'IDN Live Stream';
+        roomId = str.replace(/[^a-zA-Z0-9_-]/g, '');
+      }
+    } else {
+      // Plain username or slug e.g. "jkt48_freya" or "idnlinks/live-room-175ikv"
+      const slug = str.replace(/^\/+/, '');
+      roomId = slug;
+      embedUrl = `https://www.idn.app/embed/${slug}`;
+      directUrl = `https://www.idn.app/${slug}`;
+      displayName = slug.startsWith('jkt48_')
+        ? slug.replace('jkt48_', 'JKT48 ').replace(/_/g, ' ').toUpperCase()
+        : slug;
     }
-    
-    return cleaned.replace(/[^a-zA-Z0-9_-]/g, '');
-  }
 
-  function playCustomStreamFromInput(rawInput) {
-    const username = parseIdnUsername(rawInput);
-    if (!username) return;
-
-    // Build custom stream object
-    const displayName = username.startsWith('jkt48_')
-      ? username.replace('jkt48_', 'JKT48 ').replace('_', ' ').toUpperCase()
-      : username;
-
-    const customStream = {
+    return {
       name: displayName,
-      username: username,
-      room_id: username,
-      embed_url: `https://www.idn.app/embed/${username}`,
-      url: `https://www.idn.app/${username}/live`,
+      username: roomId,
+      room_id: encodeURIComponent(roomId),
+      embed_url: embedUrl,
+      url: directUrl,
       img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
       viewers: 1500,
       started_at: new Date().toISOString()
     };
+  }
 
-    showWatchView(customStream);
+  function playCustomStreamFromInput(rawInput) {
+    const stream = parseStreamLink(rawInput);
+    if (!stream) return;
+    showWatchView(stream);
   }
 
   // Init App
