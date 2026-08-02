@@ -41,12 +41,31 @@
   <section id="homeView" class="view-section active">
     <div class="home-container">
       
-      <!-- Hero Banner -->
+      <!-- Hero Banner & Direct Link Input Bar -->
       <div class="hero-banner">
         <div class="hero-content">
           <h2 class="hero-title">JKT48 IDN Live Mirror</h2>
-          <p class="hero-subtitle">Nikmati siaran langsung member JKT48 dengan tampilan 2-kolom yang jernih, tanpa overlay komentar di atas video.</p>
+          <p class="hero-subtitle">Masukkan link atau username IDN Live member untuk langsung menonton dengan tampilan 2-kolom yang jernih.</p>
+          
+          <!-- LINK INPUT FORM -->
+          <form id="heroStreamForm" class="stream-input-form">
+            <div class="input-group">
+              <span class="input-icon">🔗</span>
+              <input 
+                type="text" 
+                id="heroLinkInput" 
+                class="stream-input" 
+                placeholder="Tempelkan link IDN Live (misal: https://www.idn.app/jkt48_freya/live) atau username..."
+                required
+              >
+              <button type="submit" class="btn btn-primary btn-input-submit">
+                ▶ Tonton Sekarang
+              </button>
+            </div>
+          </form>
+
         </div>
+
         <button id="refreshLiveBtn" class="btn btn-secondary">
           <span class="btn-icon">🔄</span> Refresh Status
         </button>
@@ -75,6 +94,20 @@
         <button id="backToHomeBtn" class="btn btn-back">
           <span>← Kembali ke Beranda</span>
         </button>
+
+        <!-- WATCH VIEW QUICK LINK INPUT FORM -->
+        <form id="watchStreamForm" class="watch-quick-form">
+          <input 
+            type="text" 
+            id="watchLinkInput" 
+            class="watch-quick-input" 
+            placeholder="Tempel link IDN Live baru..."
+          >
+          <button type="submit" class="btn btn-primary btn-sm">
+            ▶ Putar Link
+          </button>
+        </form>
+
         <div class="watching-now-badge" id="watchingNowBadge">
           <span class="pulse-dot"></span> Sedang Menonton: <strong id="watchingMemberTitle">-</strong>
         </div>

@@ -411,6 +411,47 @@
     themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
   }
 
+  // =========================================================================
+  // Link Input Form Handlers
+  // =========================================================================
+  function parseIdnUsername(inputStr) {
+    if (!inputStr) return '';
+    let cleaned = inputStr.trim();
+    
+    // Check if input is a URL e.g. https://www.idn.app/jkt48_freya/live or https://www.idn.app/embed/jkt48_freya
+    if (cleaned.includes('idn.app/')) {
+      const parts = cleaned.split('idn.app/')[1].split('/ filter');
+      const segment = parts[0].replace('embed/', '').replace('/live', '').split('?')[0];
+      cleaned = segment;
+    }
+    
+    return cleaned.replace(/[^a-zA-Z0-9_-]/g, '');
+  }
+
+  function playCustomStreamFromInput(rawInput) {
+    const username = parseIdnUsername(rawInput);
+    if (!username) return;
+
+    // Build custom stream object
+    const displayName = username.startsWith('jkt48_')
+      ? username.replace('jkt48_', 'JKT48 ').replace('_', ' ').toUpperCase()
+      : username;
+
+    const customStream = {
+      name: displayName,
+      username: username,
+      room_id: username,
+      embed_url: `https://www.idn.app/embed/${username}`,
+      url: `https://www.idn.app/${username}/live`,
+      img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      viewers: 1500,
+      started_at: new Date().toISOString()
+    };
+
+    showWatchView(customStream);
+  }
+
+  // Init App
   document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     fetchLiveStreams();
@@ -421,6 +462,27 @@
 
     brandHomeBtn.addEventListener('click', showHomeView);
     backToHomeBtn.addEventListener('click', showHomeView);
+
+    // Hero Form Submit
+    const heroStreamForm = document.getElementById('heroStreamForm');
+    const heroLinkInput = document.getElementById('heroLinkInput');
+    if (heroStreamForm && heroLinkInput) {
+      heroStreamForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        playCustomStreamFromInput(heroLinkInput.value);
+      });
+    }
+
+    // Watch Quick Form Submit
+    const watchStreamForm = document.getElementById('watchStreamForm');
+    const watchLinkInput = document.getElementById('watchLinkInput');
+    if (watchStreamForm && watchLinkInput) {
+      watchStreamForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        playCustomStreamFromInput(watchLinkInput.value);
+        watchLinkInput.value = '';
+      });
+    }
 
     setInterval(fetchLiveStreams, 30000);
   });
