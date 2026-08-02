@@ -132,37 +132,71 @@
     const openIdnDirectLink = document.getElementById('openIdnDirectLink');
     if (openIdnDirectLink) openIdnDirectLink.href = directUrl;
 
+    const overlayDirectBtn = document.getElementById('overlayDirectBtn');
+    if (overlayDirectBtn) overlayDirectBtn.href = directUrl;
+
     // Highlight active card in quick bar
     renderLiveMembersBar(allStreams);
 
-    // Load IDN Live Embed Player
-    loadIdnEmbedStream(stream);
+    // Decide Player Mode (HLS Video vs IDN Embed Iframe)
+    if (stream.url && stream.url.includes('.m3u8')) {
+      playHlsMode(stream.url);
+    } else {
+      playEmbedIframeMode(stream);
+    }
 
     // Poll live comments
     startChatPolling(stream.room_id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function loadIdnEmbedStream(stream) {
-    showSpinner(true);
+  function playHlsMode(m3u8Url) {
+    const videoPlayer = document.getElementById('videoPlayer');
     const idnEmbedPlayer = document.getElementById('idnEmbedPlayer');
-    if (!idnEmbedPlayer) return;
+    const playerFallbackOverlay = document.getElementById('playerFallbackOverlay');
 
-    let targetUrl = stream.embed_url || stream.url || '';
-    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
-      targetUrl = `https://www.idn.app/${stream.username || stream.room_id}`;
+    if (idnEmbedPlayer) {
+      idnEmbedPlayer.classList.add('hidden');
+      idnEmbedPlayer.src = 'about:blank';
     }
+    if (playerFallbackOverlay) playerFallbackOverlay.classList.add('hidden');
 
-    idnEmbedPlayer.src = targetUrl;
-    
-    idnEmbedPlayer.onload = () => {
-      showSpinner(false);
-    };
+    if (videoPlayer) {
+      videoPlayer.classList.remove('hidden');
+      loadHlsStream(m3u8Url);
+    }
+  }
 
-    // Safety fallback timeout to hide spinner
-    setTimeout(() => {
-      showSpinner(false);
-    }, 2500);
+  function playEmbedIframeMode(stream) {
+    const videoPlayer = document.getElementById('videoPlayer');
+    const idnEmbedPlayer = document.getElementById('idnEmbedPlayer');
+    const playerFallbackOverlay = document.getElementById('playerFallbackOverlay');
+
+    if (videoPlayer) {
+      videoPlayer.classList.add('hidden');
+      videoPlayer.pause();
+    }
+    if (playerFallbackOverlay) playerFallbackOverlay.classList.add('hidden');
+
+    if (idnEmbedPlayer) {
+      idnEmbedPlayer.classList.remove('hidden');
+      showSpinner(true);
+
+      let targetUrl = stream.embed_url || stream.url || '';
+      if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+        targetUrl = `https://www.idn.app/${stream.username || stream.room_id}`;
+      }
+
+      idnEmbedPlayer.src = targetUrl;
+      
+      idnEmbedPlayer.onload = () => {
+        showSpinner(false);
+      };
+
+      setTimeout(() => {
+        showSpinner(false);
+      }, 2500);
+    }
   }
 
   function showHomeView() {
@@ -508,6 +542,16 @@
         watchLinkInput.value = '';
       });
     }
+
+    // Preset Sample Link Chips
+    document.querySelectorAll('.preset-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const sampleUrl = chip.getAttribute('data-sample');
+        if (sampleUrl) {
+          playCustomStreamFromInput(sampleUrl);
+        }
+      });
+    });
 
     setInterval(fetchLiveStreams, 30000);
   });
