@@ -123,31 +123,39 @@ def health_check():
 async def get_live_streams():
     cached = get_cached("live_streams", CACHE_TTL_LIVE)
     if cached is not None:
-        return {"source": "cache", "data": cached}
+        return cached
 
     if not JKT48_API_KEY:
         # Fallback to mock data if key not configured
-        set_cached("live_streams", MOCK_LIVE_STREAMS)
-        return {"source": "mock", "data": MOCK_LIVE_STREAMS}
+        res = {"source": "mock", "is_mock": True, "data": MOCK_LIVE_STREAMS}
+        set_cached("live_streams", res)
+        return res
 
     try:
-        async with httpx.AsyncClient(timeout=8.0) as client:
+        async with httpx.AsyncClient(timeout=8.0, follow_redirects=True, verify=False) as client:
             resp = await client.get(
                 f"{JKT48_BASE_URL}/live/idn",
                 params={"apikey": JKT48_API_KEY}
             )
             if resp.status_code == 200:
                 data = resp.json()
-                set_cached("live_streams", data)
-                return {"source": "live_api", "data": data}
+                if not isinstance(data, list):
+                    data = [data] if data else []
+                # If API returns empty list (no member currently live), return mock data for testing UI flow
+                if len(data) == 0:
+                    res = {"source": "live_api_empty_fallback", "is_mock": True, "data": MOCK_LIVE_STREAMS}
+                else:
+                    res = {"source": "live_api", "is_mock": False, "data": data}
+                set_cached("live_streams", res)
+                return res
             else:
-                # API error, fallback to mock
-                set_cached("live_streams", MOCK_LIVE_STREAMS)
-                return {"source": "mock_fallback_api_error", "data": MOCK_LIVE_STREAMS}
+                res = {"source": "mock_fallback_api_error", "is_mock": True, "data": MOCK_LIVE_STREAMS}
+                set_cached("live_streams", res)
+                return res
     except Exception as e:
-        # Exception during fetch, fallback to mock
-        set_cached("live_streams", MOCK_LIVE_STREAMS)
-        return {"source": "mock_fallback_exception", "data": MOCK_LIVE_STREAMS}
+        res = {"source": "mock_fallback_exception", "is_mock": True, "data": MOCK_LIVE_STREAMS, "error": str(e)}
+        set_cached("live_streams", res)
+        return res
 
 
 @app.get("/api/live/{room_id}")

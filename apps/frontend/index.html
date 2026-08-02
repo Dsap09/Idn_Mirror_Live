@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IDN Live Mirror – Clean JKT48 Streaming</title>
-  <meta name="description" content="Nonton siaran langsung IDN Live JKT48 dengan tampilan bersih, minimalis, dan tanpa gangguan overlay.">
+  <title>IDN Live Mirror – Clean JKT48 Live Streaming</title>
+  <meta name="description" content="Nonton siaran langsung IDN Live JKT48 dengan antarmuka bersih, minimalis, dan bebas dari overlay komentar yang mengganggu.">
   
-  <!-- Fonts -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,14 +14,15 @@
   <!-- Custom Styles -->
   <link rel="stylesheet" href="css/style.css">
   
-  <!-- HLS.js for HLS streaming -->
+  <!-- HLS.js for HLS video streaming -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
-  <!-- Header -->
+
+  <!-- App Header -->
   <header class="app-header">
     <div class="header-container">
-      <div class="header-brand">
+      <div class="header-brand" id="brandHomeBtn" style="cursor: pointer;" title="Kembali ke Beranda">
         <span class="brand-icon">🎥</span>
         <h1 class="brand-title">IDN Live Mirror</h1>
       </div>
@@ -39,77 +40,122 @@
     </div>
   </header>
 
-  <!-- Main Container: 2 Columns on Desktop -->
-  <main class="main-layout">
-    <!-- Left Column: Video & Member Details (70% Desktop) -->
-    <section class="player-column">
-      <div class="video-container" id="videoContainer">
-        <!-- Live Status Pulse Badge inside player -->
-        <div class="player-live-badge">
-          <span class="live-pulse"></span> LIVE
+  <!-- VIEW 1: BERANDA / HOME VIEW -->
+  <section id="homeView" class="view-section active">
+    <div class="home-container">
+      
+      <!-- Hero Banner -->
+      <div class="hero-banner">
+        <div class="hero-content">
+          <h2 class="hero-title">JKT48 IDN Live Mirror</h2>
+          <p class="hero-subtitle">Nikmati siaran langsung member JKT48 dengan tampilan 2-kolom yang jernih, tanpa overlay komentar di atas video.</p>
         </div>
-
-        <!-- Buffer Spinner -->
-        <div class="player-spinner hidden" id="playerSpinner">
-          <div class="spinner-ring"></div>
-        </div>
-
-        <!-- Video Element -->
-        <video id="videoPlayer" playsinline controls></video>
+        <button id="refreshLiveBtn" class="btn btn-secondary">
+          <span class="btn-icon">🔄</span> Refresh Status
+        </button>
       </div>
 
-      <!-- Member Info Bar below Video -->
-      <div class="member-info-card">
-        <div class="member-meta">
-          <img id="memberAvatar" class="member-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Member Avatar">
-          <div class="member-text">
-            <h2 id="memberName" class="member-name">Memuat siaran...</h2>
-            <div class="member-stats">
-              <span class="stat-item"><span class="stat-icon">👁️</span> <span id="viewerCount">0</span> penonton</span>
-              <span class="stat-divider">•</span>
-              <span class="stat-item" id="streamTime">--:--</span>
+      <!-- Section Title -->
+      <div class="section-header">
+        <h3 class="section-title">🔴 Member Sedang Live</h3>
+        <span id="lastUpdatedTime" class="last-updated">Diperbarui baru saja</span>
+      </div>
+
+      <!-- Live Members Grid -->
+      <div id="liveGrid" class="live-grid">
+        <!-- Skeleton Loading State -->
+        <div class="grid-loading">Memeriksa siaran live member JKT48...</div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- VIEW 2: WATCH ROOM VIEW -->
+  <section id="watchView" class="view-section hidden">
+    <div class="watch-container">
+      
+      <!-- Top Action Bar inside Watch View -->
+      <div class="watch-header-bar">
+        <button id="backToHomeBtn" class="btn btn-back">
+          <span>← Kembali ke Beranda</span>
+        </button>
+        <div class="watching-now-badge" id="watchingNowBadge">
+          <span class="pulse-dot"></span> Sedang Menonton: <strong id="watchingMemberTitle">-</strong>
+        </div>
+      </div>
+
+      <!-- Main 2-Column Grid (Desktop) -->
+      <div class="main-layout">
+        <!-- Left Column: Video Player & Info -->
+        <section class="player-column">
+          <div class="video-container" id="videoContainer">
+            <div class="player-live-badge">
+              <span class="live-pulse"></span> LIVE
+            </div>
+
+            <!-- Buffer Spinner -->
+            <div class="player-spinner hidden" id="playerSpinner">
+              <div class="spinner-ring"></div>
+            </div>
+
+            <!-- Video Player Element -->
+            <video id="videoPlayer" playsinline controls></video>
+          </div>
+
+          <!-- Member Info Card -->
+          <div class="member-info-card">
+            <div class="member-meta">
+              <img id="memberAvatar" class="member-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Avatar Member">
+              <div class="member-text">
+                <h2 id="memberName" class="member-name">Memuat siaran...</h2>
+                <div class="member-stats">
+                  <span class="stat-item"><span class="stat-icon">👁️</span> <span id="viewerCount">0</span> penonton</span>
+                  <span class="stat-divider">•</span>
+                  <span class="stat-item" id="streamTime">--:--</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="player-controls-extra">
+              <select id="qualitySelect" class="quality-select" aria-label="Kualitas Video">
+                <option value="auto">Auto Quality</option>
+              </select>
             </div>
           </div>
-        </div>
-        
-        <div class="player-controls-extra">
-          <select id="qualitySelect" class="quality-select" aria-label="Pilih Kualitas Video">
-            <option value="auto">Auto Quality</option>
-          </select>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <!-- Right Column: Comments Panel (30% Desktop) -->
-    <aside class="chat-column">
-      <div class="chat-panel">
-        <div class="chat-header">
-          <h3>💬 Komentar</h3>
-          <span class="chat-status-indicator" id="chatStatus">Real-time</span>
-        </div>
-        
-        <!-- Comments List -->
-        <div class="chat-feed" id="chatFeed">
-          <div class="chat-loading">Memuat komentar...</div>
-        </div>
+        <!-- Right Column: Chat Comments Panel -->
+        <aside class="chat-column">
+          <div class="chat-panel">
+            <div class="chat-header">
+              <h3>💬 Komentar Live</h3>
+              <span class="chat-status-indicator" id="chatStatus">Real-time</span>
+            </div>
+            
+            <div class="chat-feed" id="chatFeed">
+              <div class="chat-loading">Memuat komentar...</div>
+            </div>
+          </div>
+        </aside>
       </div>
-    </aside>
-  </main>
 
-  <!-- Bottom Bar: Live Members Selector -->
-  <footer class="live-bar-footer">
-    <div class="live-bar-container">
-      <div class="live-bar-title">
-        <span class="live-icon">🔴</span> Live Now
-      </div>
-      <div class="live-members-scroll" id="liveMembersList">
-        <!-- Live Member Cards populated dynamically -->
-        <div class="member-card-skeleton">Memuat daftar member...</div>
-      </div>
+      <!-- Bottom Bar: Quick Switch Live Bar -->
+      <footer class="live-bar-footer">
+        <div class="live-bar-container">
+          <div class="live-bar-title">
+            <span class="live-icon">🔴</span> Live Lainnya
+          </div>
+          <div class="live-members-scroll" id="liveMembersList">
+            <div class="member-card-skeleton">Memuat daftar member...</div>
+          </div>
+        </div>
+      </footer>
+
     </div>
-  </footer>
+  </section>
 
-  <!-- Main JavaScript App -->
+  <!-- Application Logic -->
   <script src="js/app.js"></script>
 </body>
 </html>
